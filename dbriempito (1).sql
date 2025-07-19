@@ -1,0 +1,252 @@
+CREATE DATABASE  IF NOT EXISTS `sakila` /*!40100 DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci */ /*!80016 DEFAULT ENCRYPTION='N' */;
+USE `sakila`;
+-- MySQL dump 10.13  Distrib 8.0.42, for Win64 (x86_64)
+--
+-- Host: localhost    Database: sakila
+-- ------------------------------------------------------
+-- Server version	8.0.42
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!50503 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `autori`
+--
+
+DROP TABLE IF EXISTS `autori`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `autori` (
+  `idAutori` int NOT NULL,
+  `Nome` varchar(45) NOT NULL,
+  `Nazionalità` varchar(45) NOT NULL,
+  PRIMARY KEY (`idAutori`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `autori`
+--
+
+LOCK TABLES `autori` WRITE;
+/*!40000 ALTER TABLE `autori` DISABLE KEYS */;
+INSERT INTO `autori` VALUES (1,'Italo Calvino','Italiana'),(2,'George Orwell','Britannica'),(3,'Haruki Murakami','Giapponese'),(4,'Jane Austen','Britannica'),(5,'Gabriel Garcia Marquez','Colombiana'),(6,'Franz Kafka','Austriaca'),(7,'J.K. Rowling','Britannica'),(8,'Umberto Eco','Italiana'),(9,'Albert Camus','Francese'),(10,'Margaret Atwood','Canadese'),(11,'Kazuo Ishiguro','Britannica'),(12,'Annie Ernaux','Francese'),(13,'Jhumpa Lahiri','Indiana-Americana'),(14,'Orhan Pamuk','Turca'),(15,'Ian McEwan','Britannica'),(16,'Chimamanda Ngozi Adichie','Nigeriana'),(17,'Colson Whitehead','Americana'),(18,'Alice Munro','Canadese'),(19,'David Mitchell','Britannica'),(20,'Han Kang','Coreana'),(21,'Sally Rooney','Irlandese'),(22,'André Aciman','Egiziana-Americana'),(23,'Sayaka Murata','Giapponese'),(24,'Ocean Vuong','Vietnamita-Americana'),(25,'Nicole Krauss','Americana'),(26,'Teju Cole','Nigeriana'),(27,'NoViolet Bulawayo','Zimbabwese'),(28,'Olga Tokarczuk','Polacca'),(29,'Roberto Bolaño','Cilena'),(30,'Khaled Hosseini','Afghana'),(31,'Virginia Woolf','Britannica'),(32,'Isaac Asimov','Americana'),(33,'Aldous Huxley','Britannica'),(34,'Dante Alighieri','Italiana'),(35,'Stephen King','Americana'),(36,'Oscar Wilde','Irlandese'),(37,'Toni Morrison','Americana'),(38,'Charles Dickens','Britannica'),(39,'Leo Tolstoy','Russa'),(40,'Victor Hugo','Francese');
+/*!40000 ALTER TABLE `autori` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `clienti`
+--
+
+DROP TABLE IF EXISTS `clienti`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `clienti` (
+  `id_cliente` smallint unsigned NOT NULL,
+  `nome` varchar(45) NOT NULL,
+  `E-mail` varchar(45) NOT NULL,
+  `numero_tel` varchar(45) NOT NULL,
+  `indirizzo` varchar(45) NOT NULL,
+  `codiceF` varchar(45) DEFAULT NULL,
+  `PartitaIva` varchar(45) DEFAULT NULL,
+  `tipocliente` enum('Privato','Servizio Publico') NOT NULL,
+  PRIMARY KEY (`id_cliente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `clienti`
+--
+
+LOCK TABLES `clienti` WRITE;
+/*!40000 ALTER TABLE `clienti` DISABLE KEYS */;
+/*!40000 ALTER TABLE `clienti` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `collocati`
+--
+
+DROP TABLE IF EXISTS `collocati`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `collocati` (
+  `Posizione` varchar(45) NOT NULL,
+  `Numero_copie` varchar(45) NOT NULL,
+  `Disponibilità` tinyint(1) NOT NULL,
+  `Settori_idSettore` int NOT NULL,
+  `Libri_CodiceLibro` int NOT NULL,
+  PRIMARY KEY (`Settori_idSettore`,`Libri_CodiceLibro`),
+  KEY `fk_Collocati_Settori1_idx` (`Settori_idSettore`),
+  KEY `fk_Collocati_Libri1_idx` (`Libri_CodiceLibro`),
+  CONSTRAINT `fk_Collocati_Libri1` FOREIGN KEY (`Libri_CodiceLibro`) REFERENCES `libri` (`CodiceLibro`),
+  CONSTRAINT `fk_Collocati_Settori1` FOREIGN KEY (`Settori_idSettore`) REFERENCES `settori` (`idSettore`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `collocati`
+--
+
+LOCK TABLES `collocati` WRITE;
+/*!40000 ALTER TABLE `collocati` DISABLE KEYS */;
+/*!40000 ALTER TABLE `collocati` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `disponibilità`
+--
+
+DROP TABLE IF EXISTS `disponibilità`;
+/*!50001 DROP VIEW IF EXISTS `disponibilità`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `disponibilità` AS SELECT 
+ 1 AS `codicelibro`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Table structure for table `libri`
+--
+
+DROP TABLE IF EXISTS `libri`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `libri` (
+  `CodiceLibro` int NOT NULL,
+  `Nome` varchar(45) NOT NULL,
+  `Edizione` varchar(45) NOT NULL,
+  `Anno` int DEFAULT NULL,
+  `Autori_idAutori` int NOT NULL,
+  `CostoPrestito` varchar(45) NOT NULL,
+  `Genere` varchar(45) NOT NULL,
+  PRIMARY KEY (`CodiceLibro`,`Autori_idAutori`),
+  KEY `fk_Libri_Autori1_idx` (`Autori_idAutori`),
+  CONSTRAINT `fk_Libri_Autori1` FOREIGN KEY (`Autori_idAutori`) REFERENCES `autori` (`idAutori`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `libri`
+--
+
+LOCK TABLES `libri` WRITE;
+/*!40000 ALTER TABLE `libri` DISABLE KEYS */;
+INSERT INTO `libri` VALUES (1,'Il barone rampante','Prima',1957,1,'2.50','Romanzo'),(2,'Il barone rampante','Seconda',1960,1,'2.50','Romanzo'),(3,'Le città invisibili','Prima',1972,1,'2.70','Filosofia'),(4,'1984','Prima',1949,2,'2.00','Distopia'),(5,'1984','Seconda',1955,2,'2.00','Distopia'),(6,'La fattoria degli animali','Prima',1945,2,'2.10','Satira'),(7,'Kafka sulla spiaggia','Prima',2002,3,'4.00','Fantastico'),(8,'Kafka sulla spiaggia','Seconda',2006,3,'4.00','Fantastico'),(9,'Norwegian Wood','Prima',1987,3,'3.80','Narrativa'),(10,'Orgoglio e pregiudizio','Prima',1813,4,'2.00','Romanzo'),(11,'Emma','Prima',1815,4,'2.10','Romanzo'),(12,'Ragione e sentimento','Prima',1811,4,'2.10','Romanzo'),(13,'Cent’anni di solitudine','Prima',1967,5,'3.00','Realismo Magico'),(14,'L’amore ai tempi del colera','Prima',1985,5,'3.10','Romanzo'),(15,'La metamorfosi','Prima',1915,6,'2.00','Romanzo breve'),(16,'Il processo','Prima',1925,6,'2.10','Romanzo'),(17,'Harry Potter e la pietra filosofale','Prima',1997,7,'3.00','Fantasy'),(18,'Harry Potter e la pietra filosofale','Seconda',1998,7,'3.00','Fantasy'),(19,'Harry Potter e la camera dei segreti','Prima',1998,7,'3.10','Fantasy'),(20,'Il nome della rosa','Prima',1980,8,'3.00','Giallo storico'),(21,'Il nome della rosa','Seconda',1981,8,'3.00','Giallo storico'),(22,'Baudolino','Prima',2000,8,'2.90','Storico'),(23,'Lo straniero','Prima',1942,9,'2.60','Romanzo'),(24,'La peste','Prima',1947,9,'2.80','Romanzo'),(25,'Il racconto dell’ancella','Prima',1985,10,'3.10','Distopia'),(26,'Oryx and Crake','Prima',2003,10,'3.20','Fantascienza'),(27,'Non lasciarmi','Prima',2005,11,'3.00','Distopia'),(28,'Non lasciarmi','Seconda',2007,11,'3.00','Distopia'),(29,'Non lasciarmi','Terza',2010,11,'3.00','Distopia'),(30,'Gli anni','Prima',2008,12,'2.80','Autobiografia'),(31,'Gli anni','Seconda',2010,12,'2.80','Autobiografia'),(32,'Gli anni','Terza',2012,12,'2.80','Autobiografia'),(33,'Interpreter of Maladies','Prima',1999,13,'2.70','Racconti'),(34,'Interpreter of Maladies','Seconda',2001,13,'2.70','Racconti'),(35,'Interpreter of Maladies','Terza',2003,13,'2.70','Racconti'),(36,'Neve','Prima',2002,14,'2.90','Narrativa'),(37,'Neve','Seconda',2004,14,'2.90','Narrativa'),(38,'Neve','Terza',2006,14,'2.90','Narrativa'),(39,'Espiazione','Prima',2001,15,'3.00','Romanzo'),(40,'Espiazione','Seconda',2003,15,'3.00','Romanzo'),(41,'Espiazione','Terza',2006,15,'3.00','Romanzo'),(42,'Americanah','Prima',2013,16,'3.10','Narrativa'),(43,'Americanah','Seconda',2015,16,'3.10','Narrativa'),(44,'Americanah','Terza',2017,16,'3.10','Narrativa'),(45,'The Underground Railroad','Prima',2016,17,'3.20','Romanzo'),(46,'The Underground Railroad','Seconda',2018,17,'3.20','Romanzo'),(47,'The Underground Railroad','Terza',2020,17,'3.20','Romanzo'),(48,'Dear Life','Prima',2012,18,'2.90','Racconti'),(49,'Dear Life','Seconda',2014,18,'2.90','Racconti'),(50,'Dear Life','Terza',2016,18,'2.90','Racconti'),(51,'Cloud Atlas','Prima',2004,19,'3.20','Fantascienza'),(52,'Cloud Atlas','Seconda',2006,19,'3.20','Fantascienza'),(53,'Cloud Atlas','Terza',2008,19,'3.20','Fantascienza'),(54,'La vegetariana','Prima',2007,20,'2.80','Narrativa'),(55,'La vegetariana','Seconda',2009,20,'2.80','Narrativa'),(56,'La vegetariana','Terza',2011,20,'2.80','Narrativa'),(57,'Persone normali','Prima',2018,21,'3.00','Narrativa'),(58,'Persone normali','Seconda',2019,21,'3.00','Narrativa'),(59,'Persone normali','Terza',2020,21,'3.00','Narrativa'),(60,'Chiamami col tuo nome','Prima',2007,22,'3.10','Romantico'),(61,'Chiamami col tuo nome','Seconda',2009,22,'3.10','Romantico'),(62,'Chiamami col tuo nome','Terza',2012,22,'3.10','Romantico'),(63,'La ragazza del convenience store','Prima',2016,23,'2.90','Narrativa'),(64,'La ragazza del convenience store','Seconda',2017,23,'2.90','Narrativa'),(65,'La ragazza del convenience store','Terza',2018,23,'2.90','Narrativa'),(66,'On Earth We’re Briefly Gorgeous','Prima',2019,24,'3.30','Poetico'),(67,'On Earth We’re Briefly Gorgeous','Seconda',2020,24,'3.30','Poetico'),(68,'On Earth We’re Briefly Gorgeous','Terza',2021,24,'3.30','Poetico'),(69,'La storia dell’amore','Prima',2005,25,'2.95','Romantico'),(70,'La storia dell’amore','Seconda',2007,25,'2.95','Romantico'),(71,'La storia dell’amore','Terza',2009,25,'2.95','Romantico'),(72,'Every Day is for the Thief','Prima',2007,26,'2.90','Narrativa'),(73,'Every Day is for the Thief','Seconda',2009,26,'2.90','Narrativa'),(74,'Every Day is for the Thief','Terza',2011,26,'2.90','Narrativa'),(75,'We Need New Names','Prima',2013,27,'3.10','Narrativa'),(76,'We Need New Names','Seconda',2015,27,'3.10','Narrativa'),(77,'We Need New Names','Terza',2017,27,'3.10','Narrativa'),(78,'I vagabondi','Prima',2018,28,'3.00','Narrativa contemporanea'),(79,'I vagabondi','Seconda',2019,28,'3.00','Narrativa contemporanea'),(80,'I vagabondi','Terza',2020,28,'3.00','Narrativa contemporanea'),(81,'2666','Prima',2004,29,'3.50','Romanzo'),(82,'2666','Seconda',2006,29,'3.50','Romanzo'),(83,'2666','Terza',2008,29,'3.50','Romanzo'),(84,'Il cacciatore di aquiloni','Prima',2003,30,'3.10','Narrativa'),(85,'Il cacciatore di aquiloni','Seconda',2005,30,'3.10','Narrativa'),(86,'Il cacciatore di aquiloni','Terza',2007,30,'3.10','Narrativa');
+/*!40000 ALTER TABLE `libri` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `prestiti`
+--
+
+DROP TABLE IF EXISTS `prestiti`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `prestiti` (
+  `idprestito` int NOT NULL,
+  `DataInizio` date NOT NULL,
+  `clienti_id_cliente` smallint unsigned NOT NULL,
+  `DataFine` date NOT NULL,
+  `DataRestituzione` varchar(45) NOT NULL,
+  PRIMARY KEY (`idprestito`,`clienti_id_cliente`),
+  KEY `fk_prestiti_clienti1_idx` (`clienti_id_cliente`),
+  CONSTRAINT `fk_prestiti_clienti1` FOREIGN KEY (`clienti_id_cliente`) REFERENCES `clienti` (`id_cliente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `prestiti`
+--
+
+LOCK TABLES `prestiti` WRITE;
+/*!40000 ALTER TABLE `prestiti` DISABLE KEYS */;
+/*!40000 ALTER TABLE `prestiti` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ritardi`
+--
+
+DROP TABLE IF EXISTS `ritardi`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `ritardi` (
+  `idritardi` int NOT NULL,
+  `prestiti_idprestito` int NOT NULL,
+  `prestiti_clienti_id_cliente` smallint unsigned NOT NULL,
+  `penale` varchar(45) NOT NULL,
+  PRIMARY KEY (`idritardi`,`prestiti_idprestito`,`prestiti_clienti_id_cliente`),
+  KEY `fk_ritardi_prestiti1_idx` (`prestiti_idprestito`,`prestiti_clienti_id_cliente`),
+  CONSTRAINT `fk_ritardi_prestiti1` FOREIGN KEY (`prestiti_idprestito`, `prestiti_clienti_id_cliente`) REFERENCES `prestiti` (`idprestito`, `clienti_id_cliente`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ritardi`
+--
+
+LOCK TABLES `ritardi` WRITE;
+/*!40000 ALTER TABLE `ritardi` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ritardi` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `settori`
+--
+
+DROP TABLE IF EXISTS `settori`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `settori` (
+  `idSettore` int NOT NULL,
+  `Genere` varchar(45) NOT NULL,
+  PRIMARY KEY (`idSettore`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `settori`
+--
+
+LOCK TABLES `settori` WRITE;
+/*!40000 ALTER TABLE `settori` DISABLE KEYS */;
+/*!40000 ALTER TABLE `settori` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Final view structure for view `disponibilità`
+--
+
+/*!50001 DROP VIEW IF EXISTS `disponibilità`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb3 */;
+/*!50001 SET character_set_results     = utf8mb3 */;
+/*!50001 SET collation_connection      = utf8mb3_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `disponibilità` AS select `libri`.`CodiceLibro` AS `codicelibro` from (`libri` join `collocati`) where (`collocati`.`Disponibilità` = 0) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2025-07-19 19:24:01
