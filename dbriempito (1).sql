@@ -68,6 +68,7 @@ CREATE TABLE `clienti` (
 
 LOCK TABLES `clienti` WRITE;
 /*!40000 ALTER TABLE `clienti` DISABLE KEYS */;
+INSERT INTO `clienti` VALUES (1,'Federico D\'Angelo','federicodangelo27@gmail.com','3311119112','Via Battistello Caracciolo 16','DNGFRC05D23F839Q',NULL,'Privato'),(2,'Mario Carillo','mario.carillo@alcampus.it','3281383842','Via Francesco Curia 16','CRLMRA03D2222F839I',NULL,'Privato'),(3,'Gaia Esposito','gaia.esposito@alcampus.it','3664514508','Via dell\'elzeviro 29','SPSGAI04C56F839C',NULL,'Privato');
 /*!40000 ALTER TABLE `clienti` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -219,6 +220,7 @@ CREATE TABLE `settori` (
 
 LOCK TABLES `settori` WRITE;
 /*!40000 ALTER TABLE `settori` DISABLE KEYS */;
+INSERT INTO `settori` VALUES (1,'Romanzo'),(2,'Filosofia'),(3,'Distopia'),(4,'Satira'),(5,'Fantastico'),(6,'Narrativa'),(7,'Realismo Magico'),(8,'Romanzo breve'),(9,'Fantasy'),(10,'Giallo storico'),(11,'Storico'),(12,'Autobiografia'),(13,'Racconti'),(14,'Fantascienza'),(15,'Romantico'),(16,'Poetico'),(17,'Narrativa contemporanea');
 /*!40000 ALTER TABLE `settori` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -249,4 +251,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-19 19:24:01
+-- Dump completed on 2025-07-20 13:50:50
