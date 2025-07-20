@@ -157,7 +157,7 @@ CREATE TABLE `prestiti` (
   `DataInizio` date NOT NULL,
   `clienti_id_cliente` smallint unsigned NOT NULL,
   `DataFine` date NOT NULL,
-  `DataRestituzione` varchar(45) NOT NULL,
+  `DataRestituzione` date DEFAULT NULL,
   PRIMARY KEY (`idprestito`,`clienti_id_cliente`),
   KEY `fk_prestiti_clienti1_idx` (`clienti_id_cliente`),
   CONSTRAINT `fk_prestiti_clienti1` FOREIGN KEY (`clienti_id_cliente`) REFERENCES `clienti` (`id_cliente`)
@@ -170,7 +170,35 @@ CREATE TABLE `prestiti` (
 
 LOCK TABLES `prestiti` WRITE;
 /*!40000 ALTER TABLE `prestiti` DISABLE KEYS */;
+INSERT INTO `prestiti` VALUES (1,'2025-06-01',1,'2025-06-15','2025-06-14'),(2,'2025-06-10',2,'2025-06-24','2025-06-24'),(3,'2025-06-12',3,'2025-06-26','2025-06-25'),(4,'2025-06-15',1,'2025-06-29','2025-07-01'),(5,'2025-06-20',2,'2025-07-04','2025-07-10'),(6,'2025-06-25',3,'2025-07-09','2025-07-12'),(7,'2025-07-10',1,'2025-07-24',NULL),(8,'2025-07-12',2,'2025-07-26',NULL),(9,'2025-06-30',3,'2025-07-10',NULL),(10,'2025-07-01',1,'2025-07-15',NULL);
 /*!40000 ALTER TABLE `prestiti` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `prestiti_libri`
+--
+
+DROP TABLE IF EXISTS `prestiti_libri`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `prestiti_libri` (
+  `idprestito` int NOT NULL,
+  `CodiceLibro` int NOT NULL,
+  PRIMARY KEY (`idprestito`,`CodiceLibro`),
+  KEY `CodiceLibro` (`CodiceLibro`),
+  CONSTRAINT `prestiti_libri_ibfk_1` FOREIGN KEY (`idprestito`) REFERENCES `prestiti` (`idprestito`),
+  CONSTRAINT `prestiti_libri_ibfk_2` FOREIGN KEY (`CodiceLibro`) REFERENCES `libri` (`CodiceLibro`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `prestiti_libri`
+--
+
+LOCK TABLES `prestiti_libri` WRITE;
+/*!40000 ALTER TABLE `prestiti_libri` DISABLE KEYS */;
+INSERT INTO `prestiti_libri` VALUES (3,3),(1,5),(5,6),(4,7),(3,8),(2,9),(9,10),(9,11),(1,12),(5,13),(8,14),(7,15),(10,16),(6,18),(3,21),(6,22);
+/*!40000 ALTER TABLE `prestiti_libri` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -251,4 +279,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-07-20 13:50:50
+-- Dump completed on 2025-07-20 18:50:03
