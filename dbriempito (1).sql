@@ -27,7 +27,7 @@ DROP TABLE IF EXISTS `autori`;
 CREATE TABLE `autori` (
   `idAutori` int NOT NULL,
   `Nome` varchar(45) NOT NULL,
-  `Nazionalità` varchar(45) NOT NULL,
+  `Nazionalita` varchar(45) NOT NULL,
   PRIMARY KEY (`idAutori`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -81,7 +81,7 @@ DROP TABLE IF EXISTS `collocati`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `collocati` (
   `Posizione` varchar(45) DEFAULT NULL,
-  `Disponibilità` tinyint(1) NOT NULL,
+  `Disponibilita` tinyint(1) NOT NULL,
   `Settori_idSettore` int NOT NULL,
   `Libri_CodiceLibro` int NOT NULL,
   PRIMARY KEY (`Settori_idSettore`,`Libri_CodiceLibro`),
@@ -103,14 +103,14 @@ INSERT INTO `collocati` VALUES ('ROM.01',1,1,1),('ROM.02',1,1,2),(NULL,0,1,10),(
 UNLOCK TABLES;
 
 --
--- Temporary view structure for view `disponibilità`
+-- Temporary view structure for view `disponibilita`
 --
 
-DROP TABLE IF EXISTS `disponibilità`;
-/*!50001 DROP VIEW IF EXISTS `disponibilità`*/;
+DROP TABLE IF EXISTS `disponibilita`;
+/*!50001 DROP VIEW IF EXISTS `disponibilita`*/;
 SET @saved_cs_client     = @@character_set_client;
 /*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `disponibilità` AS SELECT 
+/*!50001 CREATE VIEW `disponibilita` AS SELECT 
  1 AS `codicelibro`*/;
 SET character_set_client = @saved_cs_client;
 
@@ -255,10 +255,10 @@ INSERT INTO `settori` VALUES (1,'Romanzo'),(2,'Filosofia'),(3,'Distopia'),(4,'Sa
 UNLOCK TABLES;
 
 --
--- Final view structure for view `disponibilità`
+-- Final view structure for view `disponibilita`
 --
 
-/*!50001 DROP VIEW IF EXISTS `disponibilità`*/;
+/*!50001 DROP VIEW IF EXISTS `disponibilita`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
@@ -267,7 +267,7 @@ UNLOCK TABLES;
 /*!50001 SET collation_connection      = utf8mb3_general_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `disponibilità` AS select `libri`.`CodiceLibro` AS `codicelibro` from (`libri` join `collocati`) where (`collocati`.`Disponibilità` = 0) */;
+/*!50001 VIEW `disponibilita` AS select `libri`.`CodiceLibro` AS `codicelibro` from (`libri` join `collocati`) where (`collocati`.`Disponibilità` = 0) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
