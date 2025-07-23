@@ -95,22 +95,20 @@ require_once './database.php';
   </style>
 </head>
 <body>
-<form method="POST" action="">
-</form>
   <div class="login-container">
     <img src="https://i.postimg.cc/G2XR3NGz/IMG-0832.jpg" alt="Logo Biblioteca">
     <h2>Accesso Utente</h2>
-    <form>
+    <form method='POST' action=''>
       <div class="form-group">
         <label>
           <i class="fas fa-user"></i>
-          <input type="text" name="Email" placeholder="Email">
+          <input type="text" name="email" placeholder="Email">
         </label>
       </div>
       <div class="form-group">
         <label>
           <i class="fas fa-lock"></i>
-          <input type="password" name="Password" placeholder="Password">
+          <input type="password" name="password" placeholder="Password">
         </label>
       </div>
       <button type="submit" class="login-btn">Login</button>
@@ -124,16 +122,19 @@ require_once './database.php';
     </div>
   </div>
   <?php
+  session_start();
+  require_once('configurazione.php');
     $conn=openconnection();
     if(isset($_POST["email"])&& $_SERVER['REQUEST_METHOD']==='POST'&& isset($_POST["password"])){
       $email=$_POST['email'];
       $password=$_POST['password'];
-      $sql1 = "SELECT * FROM clienti WHERE E-mail = '$email'";
+      $sql1 = "SELECT * FROM clienti WHERE email = '$email'";
       $result=$conn->query($sql1);
-      if($sql1->num_rows===1){
+      if($result->num_rows===1){
         $utente=$result->fetch_assoc();
-        if($password==$utente['password']){
+        if($password===$utente['password']){
           header("Location: Area_Personale.php");
+          exit;
         }
         else
           echo "Password errata.";
