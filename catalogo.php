@@ -12,7 +12,7 @@ if ($conn->connect_error) {
 }
 
 $sql = "
-SELECT 
+SELECT DISTINCT
   libri.nome AS titolo,
   libri.copertina,
   autori.nome AS autore,
