@@ -2,6 +2,24 @@
 require_once './configurazione.php';
 require_once './database.php';
 session_start();
+date_default_timezone_set('Europe/Rome');
+
+$conn = openconnection();
+$ora = time();
+
+// Sblocca tutti i libri scaduti nel database
+$stmt = $conn->prepare("UPDATE collocati SET disponibilita = 1, bloccato_fino = NULL WHERE disponibilita = 0 AND bloccato_fino <= ?");
+$stmt->bind_param("i", $ora);
+$stmt->execute();
+$stmt->close();
+
+// Rimuove anche i libri scaduti dalla sessione
+if (isset($_SESSION['carrello'])) {
+    $_SESSION['carrello'] = array_filter($_SESSION['carrello'], function ($item) use ($ora) {
+        return $item['bloccato_fino'] > $ora;
+    });
+}
+
 $session_timeout = 7200;
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['conferma_logout'])) {
@@ -237,8 +255,8 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
           <p><strong>Disponibilità:</strong>
             <?php if ($edizione['disponibilita']): ?>
               <span style="color: green;">✓ Disponibile</span>
-              <form action="aggiungi_carrello.php" method="get" style="margin-top: 10px;">
-                <input type="hidden" name="id" value="<?= htmlspecialchars($edizione['codice_libro']) ?>">
+              <form action="aggiungi_carrello.php" method="post">
+              <input type="hidden" name="id" value="<?= htmlspecialchars($edizione['codice_libro']) ?>">
                 <button type="submit" style="padding: 8px 16px; background-color: #A22522; color: white; border: none; border-radius: 20px; cursor: pointer;">
                   🛒 Aggiungi al carrello
                 </button>

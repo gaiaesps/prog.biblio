@@ -188,7 +188,7 @@ session_start();
       }
     $sql="INSERT INTO clienti (nome,email,numero_tel,indirizzo,codice_fiscale,partita_iva,tipo_cliente,password) VALUES ('$nome', '$email', '$numerotel', '$indirizzo', '$codicef', '$partitaiva', '{$_POST["tipo_cliente"]}', '$password')";
     if (mysqli_query($conn, $sql)) {
-    header("Location: login.php");
+    header("Location: home.php");
     exit;
   }else{
     echo "Errore";

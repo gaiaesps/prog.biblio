@@ -3,10 +3,29 @@
 require_once './configurazione.php';
 require_once './database.php';
 session_start();
+date_default_timezone_set('Europe/Rome');
 if (isset($_GET['return'])) {
     $_SESSION['return_url'] = $_GET['return'];
 }
-$conn=openconnection();
+
+date_default_timezone_set('Europe/Rome');
+
+$conn = openconnection();
+$ora = time();
+
+// Sblocca tutti i libri scaduti nel database
+$stmt = $conn->prepare("UPDATE collocati SET disponibilita = 1, bloccato_fino = NULL WHERE disponibilita = 0 AND bloccato_fino <= ?");
+$stmt->bind_param("i", $ora);
+$stmt->execute();
+$stmt->close();
+
+// Rimuove anche i libri scaduti dalla sessione
+if (isset($_SESSION['carrello'])) {
+    $_SESSION['carrello'] = array_filter($_SESSION['carrello'], function ($item) use ($ora) {
+        return $item['bloccato_fino'] > $ora;
+    });
+}
+
 $sql = "
 SELECT
   libri.nome AS titolo,
@@ -169,8 +188,14 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
 
   <div class="auth-buttons">
     <?php if (isset($_SESSION['id_cliente'])): ?>
-      <span style="margin-right: 15px;">Ciao, <?= htmlspecialchars($_SESSION['nome']) ?> 👋</span>
-      <a href="<?= $_SERVER['PHP_SELF'] ?>?logout=1&return=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn">Logout</a>
+      <div style="display: flex; align-items: center; gap: 20px;">
+  <span style="font-size: 16px;">Ciao, <?= htmlspecialchars($_SESSION['nome']) ?> 👋</span>
+  <a href="carrello.php" style="display: flex; align-items: center;">
+      <img src="carrellosito.png" alt="Carrello" style="width: 60px; height: 60px;">
+  </a>
+
+  <a href="<?= $_SERVER['PHP_SELF'] ?>?logout=1&return=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn">Logout</a>
+  </div>
     <?php else: ?>
       <a href="login.php" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
     <?php endif; ?>

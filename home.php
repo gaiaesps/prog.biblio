@@ -2,8 +2,26 @@
 require_once './configurazione.php';
 require_once './database.php';
 session_start();
+date_default_timezone_set('Europe/Rome');
 if (isset($_GET['return'])) {
     $_SESSION['return_url'] = $_GET['return'];
+}
+date_default_timezone_set('Europe/Rome');
+
+$conn = openconnection();
+$ora = time();
+
+// Sblocca tutti i libri scaduti nel database
+$stmt = $conn->prepare("UPDATE collocati SET disponibilita = 1, bloccato_fino = NULL WHERE disponibilita = 0 AND bloccato_fino <= ?");
+$stmt->bind_param("i", $ora);
+$stmt->execute();
+$stmt->close();
+
+// Rimuove anche i libri scaduti dalla sessione
+if (isset($_SESSION['carrello'])) {
+    $_SESSION['carrello'] = array_filter($_SESSION['carrello'], function ($item) use ($ora) {
+        return $item['bloccato_fino'] > $ora;
+    });
 }
 
 $session_timeout = 7200;
@@ -71,7 +89,7 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
       border-radius: 8px;
       padding: 10px 0;
       z-index: 999;
-      top: 110%;
+      top: 100%;
       left: 0;
     }
 
@@ -86,9 +104,11 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
       background-color: #f5f5f5;
     }
 
-    .dropdown:hover .dropdown-content {
-      display: block;
-    }
+    .dropdown:hover .dropdown-content,
+    .dropdown-content:hover {
+  display: block;
+}
+
 
     .hero {
       background: linear-gradient(120deg, #A22522, #7e1d1c);
@@ -273,8 +293,15 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
 
     <div class="auth-buttons">
       <?php if (isset($_SESSION['id_cliente'])): ?>
-        <span style="margin-right: 15px;">Ciao, <?= htmlspecialchars($_SESSION['nome']) ?> 👋</span>
-        <a href="<?= $_SERVER['PHP_SELF'] ?>?logout=1&return=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn">Logout</a>
+        <div style="display: flex; align-items: center; gap: 20px;">
+    <span style="font-size: 16px;">Ciao, <?= htmlspecialchars($_SESSION['nome']) ?> 👋</span>
+    <a href="carrello.php" style="display: flex; align-items: center;">
+        <img src="carrellosito.png" alt="Carrello" style="width: 60px; height: 60px;">
+    </a>
+
+    <a href="<?= $_SERVER['PHP_SELF'] ?>?logout=1&return=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn">Logout</a>
+    </div>
+
       <?php else: ?>
         <a href="login.php" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
       <?php endif; ?>

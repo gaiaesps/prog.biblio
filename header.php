@@ -16,13 +16,19 @@
 
 
   <div class="auth-buttons">
-    <?php if (isset($_SESSION['id_cliente'])): ?>
-      <span style="margin-right: 15px;">Ciao, <?= htmlspecialchars($_SESSION['nome']) ?> 👋</span>
+  <?php if (isset($_SESSION['id_cliente'])): ?>
+    <div style="display: flex; align-items: center; gap: 20px;">
+      <span style="font-size: 16px;">Ciao, <?= htmlspecialchars($_SESSION['nome']) ?> 👋</span>
+      <a href="carrello.php" style="display: flex; align-items: center;">
+        <img src="carrellosito.png" alt="Carrello" style="width: 60px; height: 60px;">
+      </a>
       <a href="?logout=1<?php if (isset($_GET['id'])) echo '&id=' . intval($_GET['id']); ?>" class="btn">Logout</a>
-    <?php else: ?>
-      <a href="login.php" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
-    <?php endif; ?>
-  </div>
+    </div>
+  <?php else: ?>
+    <a href="login.php" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+  <?php endif; ?>
+</div>
+
 
 </div>
 </header>
