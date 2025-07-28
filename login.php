@@ -1,6 +1,14 @@
 <?php
 require_once './configurazione.php';
 require_once './database.php';
+session_start();
+if (!isset($_SESSION['id_cliente'])) {
+    if (isset($_GET['redirect']) && !str_contains($_GET['redirect'], 'login.php')) {
+      $_SESSION['redirect_after_login'] = $_GET['redirect'];
+    } elseif (isset($_SERVER['HTTP_REFERER']) && !str_contains($_SERVER['HTTP_REFERER'], 'login.php')) {
+      $_SESSION['redirect_after_login'] = $_SERVER['HTTP_REFERER'];
+    }
+  }
 ?>
 <!DOCTYPE html>
 <html lang="it">
@@ -115,14 +123,13 @@ require_once './database.php';
     </form>
     <div class="links">
       Non hai un account?
-      <a href="#">Registrati</a>
+      <a href="registrazione.php">Registrati</a>
     </div>
     <div class="links">
-      <a href="#">Password dimenticata?</a>
+      <a href="home.php">Home</a>
     </div>
   </div>
   <?php
-  session_start();
   require_once('configurazione.php');
     $conn=openconnection();
     if(isset($_POST["email"])&& $_SERVER['REQUEST_METHOD']==='POST'&& isset($_POST["password"])){
@@ -133,7 +140,12 @@ require_once './database.php';
       if($result->num_rows===1){
         $utente=$result->fetch_assoc();
         if($password===$utente['password']){
-          header("Location: Area_Personale.php");
+          $_SESSION['id_cliente'] = $utente['id_cliente'];
+          $_SESSION['nome'] = $utente['nome'];
+          $_SESSION['login_time'] = time();
+          $redirect_url = $_SESSION['redirect_after_login'] ?? 'home.php';
+          unset($_SESSION['redirect_after_login']);
+          header("Location: $redirect_url");
           exit;
         }
         else
@@ -142,7 +154,7 @@ require_once './database.php';
       else
         echo "Utente non Trovato";
 }
-      closeconnection($conn);
+  closeconnection($conn);
   ?>
 </body>
 </html>

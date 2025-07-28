@@ -15,8 +15,8 @@ session_start();
     body {
       margin: 0;
       font-family: "Segoe UI", sans-serif;
-      background-image: url("Immagine WhatsApp 2025-07-23 ore 19.00.58_718a2bba.jpg"); /* oppure un link esterno */
-      background-size: cover; /* fa in modo che l'immagine copra tutto lo sfondo */
+      background-image: url("Immagine WhatsApp 2025-07-23 ore 19.44.21_df7848d9.jpg"); /* oppure un link esterno */
+      background-size: 100%;
       background-position: center;
       background-repeat: no-repeat;
       height: 100vh;
@@ -139,7 +139,7 @@ session_start();
       <div class="form-group">
   <label>
     <i class="fas fa-building"></i>
-    <select name="tipocliente">
+    <select name="tipo_cliente">
       <option value="Privato">Privato</option>
       <option value="Servizio Pubblico">Pubblico</option>
     </select>
@@ -149,14 +149,14 @@ session_start();
       <div class="form-group">
         <label>
           <i class="fas fa-id-badge"></i>
-          <input type="text" name="codiceF" placeholder="Codice Fiscale">
+          <input type="text" name="codice_fiscale" placeholder="Codice Fiscale">
         </label>
       </div>
 
             <div class="form-group">
               <label>
                 <i class="fas fa-id-badge"></i>
-                <input type="text" name="PartitaIva" placeholder="Partita Iva">
+                <input type="text" name="partita_iva" placeholder="Partita Iva">
               </label>
             </div>
       <div class="form-group">
@@ -175,13 +175,18 @@ session_start();
     $numerotel=$_POST["numero_tel"];
     $indirizzo=$_POST["indirizzo"];
     $password=$_POST["password"];
-    $codicef=$_POST["codiceF"];
-    $partitaiva=$_POST["PartitaIva"];
-    if($_POST["tipocliente"]==='Privato'&& empty($codicef))
+    $codicef=$_POST["codice_fiscale"];
+    $partitaiva=$_POST["partita_iva"];
+    if($_POST["tipo_cliente"]==='Privato'&& empty($codicef))
       die("Errore: il codice fiscale è obbligatorio");
-    if($_POST["tipocliente"]==='Servizio Pubblico'&& empty($partitaiva))
+    if($_POST["tipo_cliente"]==='Servizio Pubblico'&& empty($partitaiva))
       die("Errore: il codice fiscale è obbligatorio");
-    $sql="INSERT INTO clienti (nome,email,numero_tel,indirizzo,codiceF,PartitaIva,tipocliente,password) VALUES ('$nome', '$email', '$numerotel', '$indirizzo', '$codicef', '$partitaiva', '{$_POST["tipocliente"]}', '$password')";
+      $sql1 = "SELECT * FROM clienti WHERE email = '$email'";
+      $result=$conn->query($sql1);
+      if($result->num_rows===1){
+        die("Utente già Esistente");
+      }
+    $sql="INSERT INTO clienti (nome,email,numero_tel,indirizzo,codice_fiscale,partita_iva,tipo_cliente,password) VALUES ('$nome', '$email', '$numerotel', '$indirizzo', '$codicef', '$partitaiva', '{$_POST["tipo_cliente"]}', '$password')";
     if (mysqli_query($conn, $sql)) {
     header("Location: login.php");
     exit;

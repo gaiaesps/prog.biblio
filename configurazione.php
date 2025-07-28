@@ -24,7 +24,7 @@ $cfg['webtheme'] =   $server .   substr($cfg['theme'], strlen($ROOT));
 unset($ROOT);
 
 //Parametri del database
-$cfg['dbname'] = "sakila";
+$cfg['dbname'] = "bibliodb";
 $cfg['dbhost'] = "127.0.0.1";
 $cfg['dbuser'] = "root";
 $cfg['dbpwd'] = "280822";
