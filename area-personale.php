@@ -4,10 +4,6 @@ require_once('configurazione.php');
 require_once('database.php');
 $conn=openconnection();
 
-if (!isset($_SESSION['id_cliente'])) {
-    echo "Devi effettuare il login per accedere a quest'area.";
-    exit;
-}
 
 $idUtente = $_SESSION['id_cliente'];
 
@@ -52,7 +48,7 @@ $session_timeout = 7200;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['conferma_logout'])) {
   $return_url = $_SESSION['return_url'] ?? 'login.php';
 
-  // Sicurezza: consenti solo URL interni
+
   if (strpos($return_url, '/') !== 0) {
     $return_url = 'login.php';
   }
@@ -74,6 +70,7 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
     $_SESSION['login_time'] = time();
   }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -305,7 +302,50 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
 
             <?php if ($result->num_rows > 0): ?>
                 <div class="libri-container">
-                    <?php while ($row = $result->fetch_assoc()): ?>
+                    <?php while ($row = $result->fetch_assoc()):
+    if ($row['giorni_mancanti'] < 0) {
+    $giorniRitardo = abs($row['giorni_mancanti']);
+    $penale = $giorniRitardo * 1.00;
+
+    $queryIdPrestito = $conn->prepare("
+        SELECT prestiti.id_prestito
+        FROM prestiti
+        JOIN prestiti_libri ON prestiti.id_prestito = prestiti_libri.id_prestito
+        WHERE prestiti.clienti_id_cliente = ?
+          AND prestiti.data_inizio = ?
+          AND prestiti.data_fine = ?
+        LIMIT 1
+    ");
+    $queryIdPrestito->bind_param("iss", $idUtente, $row['data_inizio'], $row['data_fine']);
+    $queryIdPrestito->execute();
+    $resId = $queryIdPrestito->get_result();
+
+    if ($resId->num_rows > 0) {
+        $idPrestito = $resId->fetch_assoc()['id_prestito'];
+
+
+        $check = $conn->prepare("
+            SELECT 1 FROM ritardi
+            WHERE prestiti_id_prestito = ? AND prestiti_clienti_id_cliente = ?
+        ");
+        $check->bind_param("ii", $idPrestito, $idUtente);
+        $check->execute();
+        $res = $check->get_result();
+
+        if ($res->num_rows === 0) {
+            $insert = $conn->prepare("
+                INSERT INTO ritardi (prestiti_id_prestito, prestiti_clienti_id_cliente, penale)
+                VALUES (?, ?, ?)
+            ");
+            $insert->bind_param("iid", $idPrestito, $idUtente, $penale);
+            $insert->execute();
+        }
+
+        $row['penale'] = $penale;
+    }
+}
+?>
+
                         <div class="libro-card">
                             <img src="<?= htmlspecialchars($row['copertina']) ?>" alt="Copertina">
                             <div class="libro-info">
@@ -316,7 +356,10 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
                                     <span class="ok">Mancano <?= $row['giorni_mancanti'] ?> giorni</span>
                                 <?php else: ?>
                                     <span class="ritardo">In ritardo di <?= abs($row['giorni_mancanti']) ?> giorni!</span>
-                                <?php endif; ?>
+                                    <?php if (isset($row['penale'])): ?>
+                                        <br><span class="ritardo">Penale: €<?= number_format($row['penale'], 2, ',', '.') ?></span>
+                                      <?php endif; ?>
+                                    <?php endif; ?>
                             </div>
                         </div>
                     <?php endwhile; ?>
