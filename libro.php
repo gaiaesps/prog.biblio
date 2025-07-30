@@ -7,13 +7,11 @@ date_default_timezone_set('Europe/Rome');
 $conn = openconnection();
 $ora = time();
 
-// Sblocca tutti i libri scaduti nel database
 $stmt = $conn->prepare("UPDATE collocati SET disponibilita = 1, bloccato_fino = NULL WHERE disponibilita = 0 AND bloccato_fino <= ?");
 $stmt->bind_param("i", $ora);
 $stmt->execute();
 $stmt->close();
 
-// Rimuove anche i libri scaduti dalla sessione
 if (isset($_SESSION['carrello'])) {
     $_SESSION['carrello'] = array_filter($_SESSION['carrello'], function ($item) use ($ora) {
         return $item['bloccato_fino'] > $ora;
@@ -36,17 +34,52 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
         header("Location: login.php?timeout=1");
         exit();
     } else {
-        $_SESSION['login_time'] = time(); // rinnova la sessione
+        $_SESSION['login_time'] = time();
     }
 }
-
+$conn=openconnection();
+$titoloQuery = "SELECT nome FROM libri WHERE codice_libro = ?";
+$stmt = $conn->prepare($titoloQuery);
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$titoloResult = $stmt->get_result();
+$titoloRow = $titoloResult->fetch_assoc();
+$titolo = $titoloRow['nome'] ?? null;
+$edizioni = [];
+$libro = null;
+if ($titolo) {
+  $mainQuery = "
+    SELECT
+      l.codice_libro,
+      l.nome AS titolo,
+      l.copertina,
+      l.edizione,
+      l.costo_prestito,
+      l.genere,
+      l.anno,
+      a.nome AS autore,
+      a.nazionalita,
+      c.disponibilita
+    FROM libri l
+    JOIN autori a ON l.autori_id_autori = a.id_autori
+    JOIN collocati c ON l.codice_libro = c.libri_codice_libro
+    WHERE l.nome = ?";
+  $stmt = $conn->prepare($mainQuery);
+  $stmt->bind_param("s", $titolo);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $edizioni = $result->fetch_all(MYSQLI_ASSOC);
+  $libro = count($edizioni) > 0 ? $edizioni[0] : null;
+}
+$titolo_pagina = $libro ? $libro['titolo'] : 'Libro non trovato';
+closeconnection($conn);
 ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Biblioteca Comunale</title>
+  <title><?= htmlspecialchars($titolo_pagina) ?> </title>
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
           <style>
@@ -114,7 +147,6 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
               margin-bottom: 30px;
             }
 
-            /* Sezioni con barra colorata */
             .section {
               margin: 50px auto;
               max-width: 1000px;
@@ -198,42 +230,6 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
     <?php include 'header.php'; ?>
 
     <body>
-      <?php
-        $conn=openconnection();
-        $titoloQuery = "SELECT nome FROM libri WHERE codice_libro = ?";
-        $stmt = $conn->prepare($titoloQuery);
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $titoloResult = $stmt->get_result();
-        $titoloRow = $titoloResult->fetch_assoc();
-        $titolo = $titoloRow['nome'] ?? null;
-        $edizioni = [];
-        $libro = null;
-        if ($titolo) {
-          $mainQuery = "
-            SELECT
-              l.codice_libro,
-              l.nome AS titolo,
-              l.copertina,
-              l.edizione,
-              l.costo_prestito,
-              l.genere,
-              a.nome AS autore,
-              a.nazionalita,
-              c.disponibilita
-            FROM libri l
-            JOIN autori a ON l.autori_id_autori = a.id_autori
-            JOIN collocati c ON l.codice_libro = c.libri_codice_libro
-            WHERE l.nome = ?";
-          $stmt = $conn->prepare($mainQuery);
-          $stmt->bind_param("s", $titolo);
-          $stmt->execute();
-          $result = $stmt->get_result();
-          $edizioni = $result->fetch_all(MYSQLI_ASSOC);
-          $libro = count($edizioni) > 0 ? $edizioni[0] : null;
-        }
-        closeconnection($conn);
-        ?>
         <?php if ($libro): ?>
   <div class="section" style="max-width: 1000px; margin: 40px auto; display: flex; gap: 40px; align-items: flex-start;">
 
@@ -243,6 +239,7 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
       <h2 style="margin-top: 20px; color: #A22522;"><?= htmlspecialchars($libro['titolo']) ?></h2>
       <p><strong>Nazionalità:</strong> <?= htmlspecialchars($libro['nazionalita']) ?></p>
       <p><strong>Genere:</strong> <?= htmlspecialchars($libro['genere']) ?></p>
+      <p><strong>Anno di scrittura:</strong> <?= htmlspecialchars($libro['anno']) ?></p>
     </div>
 
     <div style="flex: 2;">
