@@ -11,13 +11,11 @@ date_default_timezone_set('Europe/Rome');
 $conn = openconnection();
 $ora = time();
 
-// Sblocca tutti i libri scaduti nel database
 $stmt = $conn->prepare("UPDATE collocati SET disponibilita = 1, bloccato_fino = NULL WHERE disponibilita = 0 AND bloccato_fino <= ?");
 $stmt->bind_param("i", $ora);
 $stmt->execute();
 $stmt->close();
 
-// Rimuove anche i libri scaduti dalla sessione
 if (isset($_SESSION['carrello'])) {
   $_SESSION['carrello'] = array_filter($_SESSION['carrello'], function ($item) use ($ora) {
     return $item['bloccato_fino'] > $ora;
@@ -29,7 +27,6 @@ $session_timeout = 7200;
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['conferma_logout'])) {
   $return_url = $_SESSION['return_url'] ?? 'login.php';
 
-  // Sicurezza: consenti solo URL interni
   if (strpos($return_url, '/') !== 0) {
     $return_url = 'login.php';
   }
@@ -212,7 +209,6 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
       color: #A22522;
     }
 
-    /* Overlay Logout */
     .overlay {
       position: fixed;
       top: 0;
@@ -324,17 +320,17 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
   <?php
   $conn = openconnection();
   $sql = "SELECT
-  l.codice_libro,
   l.nome AS titolo,
-  l.copertina,
   a.nome AS autore,
-  COUNT(pl.codice_libro) AS numero_prestiti
-  FROM prestiti_libri pl
-  JOIN libri l ON l.codice_libro = pl.codice_libro
-  JOIN autori a ON l.autori_id_autori = a.id_autori
-  GROUP BY l.codice_libro, l.nome, l.copertina, a.nome
-  ORDER BY numero_prestiti DESC
-  LIMIT 4";
+  MAX(l.copertina) AS copertina,
+  MIN(l.codice_libro) AS codice_libro,
+  COUNT(*) AS numero_prestiti
+FROM prestiti_libri pl
+JOIN libri l ON l.codice_libro = pl.codice_libro
+JOIN autori a ON l.autori_id_autori = a.id_autori
+GROUP BY l.nome, a.nome
+ORDER BY numero_prestiti DESC
+LIMIT 4";
 
   $result = $conn->query($sql);
   ?>
