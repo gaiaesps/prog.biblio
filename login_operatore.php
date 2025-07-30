@@ -2,19 +2,12 @@
 require_once './configurazione.php';
 require_once './database.php';
 session_start();
-if (!isset($_SESSION['id_cliente'])) {
-    if (isset($_GET['redirect']) && !str_contains($_GET['redirect'], 'login.php')) {
-      $_SESSION['redirect_after_login'] = $_GET['redirect'];
-    } elseif (isset($_SERVER['HTTP_REFERER']) && !str_contains($_SERVER['HTTP_REFERER'], 'login.php')) {
-      $_SESSION['redirect_after_login'] = $_SERVER['HTTP_REFERER'];
-    }
-  }
 ?>
 <!DOCTYPE html>
 <html lang="it">
 <head>
   <meta charset="UTF-8">
-  <title>Login Biblioteca</title>
+  <title>Login Operatore</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
@@ -105,59 +98,59 @@ if (!isset($_SESSION['id_cliente'])) {
 <body>
   <div class="login-container">
     <img src="https://i.postimg.cc/G2XR3NGz/IMG-0832.jpg" alt="Logo Biblioteca">
-    <h2>Accesso Utente</h2>
+    <h2>Accesso Operatore</h2>
     <form method='POST' action=''>
       <div class="form-group">
         <label>
-          <i class="fas fa-user"></i>
-          <input type="text" name="email" placeholder="Email">
+          <i class="fas fa-user-shield"></i>
+          <input type="text" name="username" placeholder="Username operatore" required>
         </label>
       </div>
       <div class="form-group">
         <label>
           <i class="fas fa-lock"></i>
-          <input type="password" name="password" placeholder="Password">
+          <input type="password" name="password" placeholder="Password" required>
         </label>
       </div>
       <button type="submit" class="login-btn">Login</button>
     </form>
     <div class="links">
-      Non hai un account?
-      <a href="registrazione.php">Registrati</a>
+      <a href="login.php">Sono un cliente</a>
     </div>
     <div class="links">
       <a href="home.php">Home</a>
     </div>
-    <div class="links">
-      <a href="login_operatore.php">Sono un operatore</a>
-    </div>
   </div>
-  <?php
-  require_once('configurazione.php');
-    $conn=openconnection();
-    if(isset($_POST["email"])&& $_SERVER['REQUEST_METHOD']==='POST'&& isset($_POST["password"])){
-      $email=$_POST['email'];
-      $password=$_POST['password'];
-      $sql1 = "SELECT * FROM clienti WHERE email = '$email'";
-      $result=$conn->query($sql1);
-      if($result->num_rows===1){
-        $utente=$result->fetch_assoc();
-        if($password===$utente['password']){
-          $_SESSION['id_cliente'] = $utente['id_cliente'];
-          $_SESSION['nome'] = $utente['nome'];
-          $_SESSION['login_time'] = time();
-          $redirect_url = $_SESSION['redirect_after_login'] ?? 'home.php';
-          unset($_SESSION['redirect_after_login']);
-          header("Location: $redirect_url");
-          exit;
+
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['username'], $_POST['password'])) {
+    $conn = openconnection();
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    $sql = "SELECT * FROM operatori WHERE username = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $res = $stmt->get_result();
+
+    if ($res->num_rows === 1) {
+        $operatore = $res->fetch_assoc();
+        if ($password === $operatore['password']) {
+            $_SESSION['id_operatore'] = $operatore['id_operatore'];
+            $_SESSION['nome_operatore'] = $operatore['nome'];
+            header("Location: area-operatore.php");
+            exit;
+        } else {
+            echo "<p style='color:red; text-align:center;'>Password errata.</p>";
         }
-        else
-          echo "Password errata.";
-      }
-      else
-        echo "Utente non Trovato";
+    } else {
+        echo "<p style='color:red; text-align:center;'>Operatore non trovato.</p>";
+    }
+
+    $stmt->close();
+    closeconnection($conn);
 }
-  closeconnection($conn);
-  ?>
+?>
 </body>
 </html>

@@ -173,10 +173,23 @@ $carrello_attivo = $_SESSION['carrello'];
         <?php endforeach; ?>
       </div>
 
-      <!-- Pulsante checkout in basso a destra -->
-      <div style="text-align: right; margin-top: 30px;">
-        <a href="checkout.php" class="btn">Procedi al pagamento →</a>
-      </div>
+<div style="text-align: right; margin-top: 30px;">
+  <?php
+    $totale = 0;
+    foreach ($carrello_attivo as $item) {
+        $stmt = $conn->prepare("SELECT costo_prestito FROM libri WHERE codice_libro = ?");
+        $stmt->bind_param("i", $item['id']);
+        $stmt->execute();
+        $res = $stmt->get_result()->fetch_assoc();
+        $totale += floatval($res['costo_prestito']);
+    }
+  ?>
+  <p style="font-size: 18px; font-weight: bold; margin-bottom: 15px;">
+    Totale da pagare: €<?= number_format($totale, 2, ',', '.') ?>
+  </p>
+  <a href="checkout.php" class="btn">Check-out →</a>
+</div>
+
     <?php endif; ?>
 
   </div>

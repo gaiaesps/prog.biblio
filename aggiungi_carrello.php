@@ -5,6 +5,10 @@ require_once './database.php';
 
 $id_libro = intval($_POST['id']);
 $scadenza = time() + 900; // 15 minuti
+if(!isset($_SESSION['id_cliente'])){
+  header("Location: login.php");
+  exit();
+}
 
 $conn = openconnection();
 

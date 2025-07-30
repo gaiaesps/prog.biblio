@@ -77,7 +77,7 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
             border-radius: 8px;
             padding: 10px 0;
             z-index: 999;
-            top: 110%;
+            top: 100%;
             left: 0;
             }
 
@@ -255,11 +255,13 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
           <p><strong>Disponibilità:</strong>
             <?php if ($edizione['disponibilita']): ?>
               <span style="color: green;">✓ Disponibile</span>
+              <?php if(!isset($_SESSION['id_operatore'])): ?>
               <form action="aggiungi_carrello.php" method="post">
               <input type="hidden" name="id" value="<?= htmlspecialchars($edizione['codice_libro']) ?>">
                 <button type="submit" style="padding: 8px 16px; background-color: #A22522; color: white; border: none; border-radius: 20px; cursor: pointer;">
                   🛒 Aggiungi al carrello
                 </button>
+                <?php endif; ?>
               </form>
             <?php else: ?>
               <span style="color: red;">✖ In prestito</span>

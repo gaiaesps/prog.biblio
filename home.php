@@ -4,7 +4,7 @@ require_once './database.php';
 session_start();
 date_default_timezone_set('Europe/Rome');
 if (isset($_GET['return'])) {
-    $_SESSION['return_url'] = $_GET['return'];
+  $_SESSION['return_url'] = $_GET['return'];
 }
 date_default_timezone_set('Europe/Rome');
 
@@ -19,37 +19,37 @@ $stmt->close();
 
 // Rimuove anche i libri scaduti dalla sessione
 if (isset($_SESSION['carrello'])) {
-    $_SESSION['carrello'] = array_filter($_SESSION['carrello'], function ($item) use ($ora) {
-        return $item['bloccato_fino'] > $ora;
-    });
+  $_SESSION['carrello'] = array_filter($_SESSION['carrello'], function ($item) use ($ora) {
+    return $item['bloccato_fino'] > $ora;
+  });
 }
 
 $session_timeout = 7200;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['conferma_logout'])) {
-    $return_url = $_SESSION['return_url'] ?? 'login.php';
+  $return_url = $_SESSION['return_url'] ?? 'login.php';
 
-    // Sicurezza: consenti solo URL interni
-    if (strpos($return_url, '/') !== 0) {
-        $return_url = 'login.php';
-    }
+  // Sicurezza: consenti solo URL interni
+  if (strpos($return_url, '/') !== 0) {
+    $return_url = 'login.php';
+  }
 
-    session_unset();
-    session_destroy();
-    header("Location: $return_url");
-    exit();
+  session_unset();
+  session_destroy();
+  header("Location: $return_url");
+  exit();
 }
 
 
 if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
-    if (time() - $_SESSION['login_time'] > $session_timeout) {
-        session_unset();
-        session_destroy();
-        header("Location: login.php?timeout=1");
-        exit();
-    } else {
-        $_SESSION['login_time'] = time();
-    }
+  if (time() - $_SESSION['login_time'] > $session_timeout) {
+    session_unset();
+    session_destroy();
+    header("Location: login.php?timeout=1");
+    exit();
+  } else {
+    $_SESSION['login_time'] = time();
+  }
 }
 ?>
 <!DOCTYPE html>
@@ -61,7 +61,6 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
   <link rel="stylesheet" href="style.css"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
-    /* Stili esistenti */
     .dropdown {
       position: relative;
       display: inline-block;
@@ -106,8 +105,8 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
 
     .dropdown:hover .dropdown-content,
     .dropdown-content:hover {
-  display: block;
-}
+      display: block;
+    }
 
 
     .hero {
@@ -275,54 +274,61 @@ if (isset($_SESSION['id_cliente']) && isset($_SESSION['login_time'])) {
 
 <body>
   <header>
-  <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 40px;">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; padding: 20px 40px;">
 
 
-    <div class="menu">
-      <div class="dropdown">
-        <button class="dropdown-button"><i class="fas fa-bars"></i> Menu</button>
-        <div class="dropdown-content">
-          <a href="catalogo.php">Catalogo</a>
-          <?php if (isset($_SESSION['id_cliente'])): ?>
-            <a href="area-personale.php">Area Personale</a>
-          <?php endif; ?>
+      <div class="menu">
+        <div class="dropdown">
+          <button class="dropdown-button"><i class="fas fa-bars"></i> Menu</button>
+          <div class="dropdown-content">
+            <a href="catalogo.php">Catalogo</a>
+            <?php if (isset($_SESSION['id_operatore'])): ?>
+              <a href="area-operatore.php">Area Operatore</a>
+            <?php endif; ?>
+            <?php if (isset($_SESSION['id_cliente'])): ?>
+              <a href="area-personale.php">Area Personale</a>
+            <?php endif; ?>
+          </div>
         </div>
       </div>
+
+
+      <div class="auth-buttons">
+        <?php if (isset($_SESSION['id_cliente'])): ?>
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <span style="font-size: 16px;">Ciao, <?= htmlspecialchars($_SESSION['nome']) ?> 👋</span>
+            <a href="carrello.php" style="display: flex; align-items: center;">
+              <img src="carrellosito.png" alt="Carrello" style="width: 60px; height: 60px;">
+            </a>
+
+            <a href="<?= $_SERVER['PHP_SELF'] ?>?logout=1&return=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn">Logout</a>
+          </div>
+        <?php elseif (isset($_SESSION['id_operatore'])): ?>
+          <div style="display: flex; align-items: center; gap: 20px;">
+            <span style="font-size: 16px;">Ciao, <?= htmlspecialchars($_SESSION['nome_operatore']) ?> 👋</span>
+            <a href="?logout=1<?php if (isset($_GET['id'])) echo '&id=' . intval($_GET['id']); ?>" class="btn">Logout</a>
+          </div>
+        <?php else: ?>
+          <a href="login.php" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <?php endif; ?>
+      </div>
+
     </div>
-
-
-    <div class="auth-buttons">
-      <?php if (isset($_SESSION['id_cliente'])): ?>
-        <div style="display: flex; align-items: center; gap: 20px;">
-    <span style="font-size: 16px;">Ciao, <?= htmlspecialchars($_SESSION['nome']) ?> 👋</span>
-    <a href="carrello.php" style="display: flex; align-items: center;">
-        <img src="carrellosito.png" alt="Carrello" style="width: 60px; height: 60px;">
-    </a>
-
-    <a href="<?= $_SERVER['PHP_SELF'] ?>?logout=1&return=<?= urlencode($_SERVER['REQUEST_URI']) ?>" class="btn">Logout</a>
-    </div>
-
-      <?php else: ?>
-        <a href="login.php" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
-      <?php endif; ?>
-    </div>
-
-  </div>
   </header>
 
-<section class="hero">
-  <h1>Benvenuto alla Biblioteca Comunale</h1>
-  <p>Un luogo dove cultura, lettura e conoscenza si incontrano</p>
-</section>
+  <section class="hero">
+    <h1>Benvenuto alla Biblioteca Comunale</h1>
+    <p>Un luogo dove cultura, lettura e conoscenza si incontrano</p>
+  </section>
 
-<?php
-$conn = openconnection();
-$sql = "SELECT
-    l.codice_libro,
-    l.nome AS titolo,
-    l.copertina,
-    a.nome AS autore,
-    COUNT(pl.codice_libro) AS numero_prestiti
+  <?php
+  $conn = openconnection();
+  $sql = "SELECT
+  l.codice_libro,
+  l.nome AS titolo,
+  l.copertina,
+  a.nome AS autore,
+  COUNT(pl.codice_libro) AS numero_prestiti
   FROM prestiti_libri pl
   JOIN libri l ON l.codice_libro = pl.codice_libro
   JOIN autori a ON l.autori_id_autori = a.id_autori
@@ -330,64 +336,64 @@ $sql = "SELECT
   ORDER BY numero_prestiti DESC
   LIMIT 4";
 
-$result = $conn->query($sql);
-?>
-
-<div class="section">
-  <h2>📚 Libri più popolari</h2>
-  <div class="book-list">
-    <?php while ($row = $result->fetch_assoc()): ?>
-      <a href="libro.php?id=<?= $row['codice_libro'] ?>" class="book-link">
-        <div class="book">
-          <img src="<?= htmlspecialchars($row['copertina'] ?: 'https://via.placeholder.com/100x140?text=Nessuna+immagine') ?>" alt="<?= htmlspecialchars($row['titolo']) ?>">
-          <h4><?= htmlspecialchars($row['titolo']) ?></h4>
-          <p><?= htmlspecialchars($row['autore']) ?></p>
-        </div>
-      </a>
-    <?php endwhile; ?>
-  </div>
-</div>
-
-<?php closeconnection($conn); ?>
-
-<main>
-  <div class="section">
-    <h2>📖 Chi siamo</h2>
-    <p>La Biblioteca Comunale è il cuore culturale della nostra città. Ogni giorno accogliamo studenti, lettori e cittadini curiosi offrendo spazi di studio, libri, eventi e supporto digitale.</p>
-  </div>
+  $result = $conn->query($sql);
+  ?>
 
   <div class="section">
-    <h2>🕒 Orari di apertura</h2>
-    <p><strong>Lunedì - Venerdì:</strong> 9:00 - 19:00</p>
-    <p><strong>Sabato:</strong> 9:00 - 13:00</p>
-    <p><strong>Domenica:</strong> Chiuso</p>
-  </div>
-
-  <div class="section">
-    <h2>📍 Contatti</h2>
-    <p><strong>Indirizzo:</strong> Via della Cultura, 123 - Città</p>
-    <p><strong>Telefono:</strong> 0123 456789</p>
-    <p><strong>Email:</strong> info@biblioteca.it</p>
-  </div>
-</main>
-
-<footer>
-  <p>&copy; 2025 Biblioteca Comunale. Tutti i diritti riservati.</p>
-</footer>
-
-<?php if (isset($_GET['logout'])): ?>
-  <div class="overlay">
-    <div class="confirm-box">
-      <h3>Sei sicuro di voler effettuare il logout?</h3>
-      <form method="post">
-        <input type="hidden" name="conferma_logout" value="1">
-        <button type="submit" class="btn-si">Sì</button>
-      </form>
-      <form method="get">
-        <button type="submit" class="btn-no">No</button>
-      </form>
+    <h2>📚 Libri più popolari</h2>
+    <div class="book-list">
+      <?php while ($row = $result->fetch_assoc()): ?>
+        <a href="libro.php?id=<?= $row['codice_libro'] ?>" class="book-link">
+          <div class="book">
+            <img src="<?= htmlspecialchars($row['copertina'] ?: 'https://via.placeholder.com/100x140?text=Nessuna+immagine') ?>" alt="<?= htmlspecialchars($row['titolo']) ?>">
+            <h4><?= htmlspecialchars($row['titolo']) ?></h4>
+            <p><?= htmlspecialchars($row['autore']) ?></p>
+          </div>
+        </a>
+      <?php endwhile; ?>
     </div>
   </div>
-<?php endif; ?>
+
+  <?php closeconnection($conn); ?>
+
+  <main>
+    <div class="section">
+      <h2>📖 Chi siamo</h2>
+      <p>La Biblioteca Comunale è il cuore culturale della nostra città. Ogni giorno accogliamo studenti, lettori e cittadini curiosi offrendo spazi di studio, libri, eventi e supporto digitale.</p>
+    </div>
+
+    <div class="section">
+      <h2>🕒 Orari di apertura</h2>
+      <p><strong>Lunedì - Venerdì:</strong> 9:00 - 19:00</p>
+      <p><strong>Sabato:</strong> 9:00 - 13:00</p>
+      <p><strong>Domenica:</strong> Chiuso</p>
+    </div>
+
+    <div class="section">
+      <h2>📍 Contatti</h2>
+      <p><strong>Indirizzo:</strong> Via della Cultura, 123 - Città</p>
+      <p><strong>Telefono:</strong> 0123 456789</p>
+      <p><strong>Email:</strong> info@biblioteca.it</p>
+    </div>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Biblioteca Comunale. Tutti i diritti riservati.</p>
+  </footer>
+
+  <?php if (isset($_GET['logout'])): ?>
+    <div class="overlay">
+      <div class="confirm-box">
+        <h3>Sei sicuro di voler effettuare il logout?</h3>
+        <form method="post">
+          <input type="hidden" name="conferma_logout" value="1">
+          <button type="submit" class="btn-si">Sì</button>
+        </form>
+        <form method="get">
+          <button type="submit" class="btn-no">No</button>
+        </form>
+      </div>
+    </div>
+  <?php endif; ?>
 </body>
 </html>

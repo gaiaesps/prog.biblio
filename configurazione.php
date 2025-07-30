@@ -4,7 +4,7 @@
  */
 
 //Amministratore dell'applicazione
-$cfg['administrator'] = "mario.carillo@alcampus.it";
+$cfg['administrator'] = "federicodangelo27@gmail.com";
 
 //Path assoluti delle directory dell'applicazione
 $DIR = str_replace("\\","/",dirname(__FILE__));
@@ -27,5 +27,5 @@ unset($ROOT);
 $cfg['dbname'] = "bibliodb";
 $cfg['dbhost'] = "127.0.0.1";
 $cfg['dbuser'] = "root";
-$cfg['dbpwd'] = "Summer.l12";
+$cfg['dbpwd'] = "280822";
 ?>
